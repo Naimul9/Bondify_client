@@ -8,10 +8,12 @@ import {
   updateProfile,
 } from 'firebase/auth'
 
-import axios from 'axios'
 
-import useAxiosPublic from '../hooks/useAxiosPublic'
+
+
 import { app } from '../firebase/firebase.config'
+import useAxiosPublic from '../../Hooks/axiosPublic'
+import axios from 'axios'
 
 
 
