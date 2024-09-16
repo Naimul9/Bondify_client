@@ -1,13 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import toast from 'react-hot-toast';
-
 import axios from 'axios';
 import { AuthContext } from '../../Provider/AuthProvider';
 
 const Register = () => {
   const navigate = useNavigate();
-  const { createUser, updateUserProfile, user, setUser } = useContext(AuthContext);
+  const { createUser, updateUserProfile, setUser } = useContext(AuthContext);
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -15,151 +14,109 @@ const Register = () => {
     const email = form.email.value;
     const name = form.name.value;
     const photo = form.photo.files[0];
-    const pass = form.password.value;
-    const confirmPass = form.confirmPassword.value;
-    const formData = new FormData();
-    formData.append('image', photo);
+    const password = form.password.value;
+    const confirmPassword = form.confirmPassword.value;
+
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
 
     try {
-      const { data } = await axios.post(`https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMAGE_HOSTING_KEY}`, formData);
+      const formData = new FormData();
+      formData.append('image', photo);
+
+      const { data } = await axios.post(
+        `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMAGE_HOSTING_KEY}`,
+        formData
+      );
       const photoURL = data.data.display_url;
 
-      const currentUser = {
-        email,
-        name,
-        photo: photoURL,
-      
-      };
-
-      console.log(currentUser);
-
-      if (pass !== confirmPass) {
-        toast.error('Passwords do not match.');
-        return;
-      }
-
-      await createUser(email, pass);
+      await createUser(email, password);
       await updateUserProfile(name, photoURL);
+
+      const currentUser = { email, name, photo: photoURL };
       await axios.put(`${import.meta.env.VITE_API_URL}/user`, currentUser);
-      setUser({ ...user, photoURL, displayName: name });
+      setUser({ email, displayName: name, photoURL });
+
       navigate('/');
       toast.success('SignUp Successful');
     } catch (err) {
       console.error(err);
-      toast.error(err?.message || 'Sign up failed');
+      toast.error(err.message || 'Sign up failed');
     }
   };
 
-  
-
   return (
-    <div className='flex justify-center items-center min-h-[calc(100vh-306px)] my-12'>
-      <div className='flex w-full max-w-sm mx-auto overflow-hidden bg-red-50 rounded-lg shadow-lg lg:max-w-4xl'>
-        <div className='w-full px-6 py-8 md:px-8 lg:w-1/2'>
-          <div className='flex justify-center mx-auto'>
-            <img className='w-auto h-7 sm:h-8' src='' alt='' />
+    <div className='flex items-center justify-center min-h-screen'>
+      <div className='w-full max-w-md p-6 bg-white rounded-lg shadow-md'>
+        <h2 className='text-center text-2xl font-semibold mb-6'>Sign Up</h2>
+
+        <form onSubmit={handleSignUp}>
+          <div className='mb-4'>
+            <label className='block mb-2'>Username</label>
+            <input
+              name='name'
+              type='text'
+              className='w-full p-2 border rounded'
+              required
+            />
           </div>
-          <p className='mt-3 text-xl text-center text-gray-600'>
-            Get Your Free Account Now.
-          </p>
-          <div className='flex items-center justify-between mt-4'>
-            <span className='w-1/5 border-b lg:w-1/4'></span>
-            <div className='text-xs text-center text-gray-500 uppercase hover:underline'>
-              or Registration with email
-            </div>
-            <span className='w-1/5 border-b dark:border-gray-400 lg:w-1/4'></span>
+
+          <div className='mb-4'>
+            <label className='block mb-2'>Email Address</label>
+            <input
+              name='email'
+              type='email'
+              className='w-full p-2 border rounded'
+              required
+            />
           </div>
-          <form onSubmit={handleSignUp}>
-            <div className='mt-4'>
-              <label className='block mb-2 text-sm font-medium text-gray-600' htmlFor='name'>
-                Username
-              </label>
-              <input
-                id='name'
-                autoComplete='name'
-                name='name'
-                className='block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg focus:border-blue-400 focus:ring-opacity-40 focus:outline-none focus:ring focus:ring-blue-300'
-                type='text'
-              />
-            </div>
-            <div className='mt-4'>
-              <label className='block mb-2 text-sm font-medium text-gray-600' htmlFor='LoggingEmailAddress'>
-                Email Address
-              </label>
-              <input
-                id='LoggingEmailAddress'
-                autoComplete='email'
-                name='email'
-                className='block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg focus:border-blue-400 focus:ring-opacity-40 focus:outline-none focus:ring focus:ring-blue-300'
-                type='email'
-              />
-            </div>
-            <div className='mt-4'>
-              <label className='block mb-2 text-sm font-medium text-gray-600' htmlFor='photo'>
-                Photo
-              </label>
-              <input
-                id='photo'
-                autoComplete='photo'
-                name='photo'
-                className='file-input file-input-bordered file-input-sm file-input-red w-full max-w-sm'
-                type='file'
-              />
-            </div>
-         
-            <div className='mt-4'>
-              <div className='flex justify-between'>
-                <label className='block mb-2 text-sm font-medium text-gray-600' htmlFor='loggingPassword'>
-                  Password
-                </label>
-              </div>
-              <input
-                id='loggingPassword'
-                autoComplete='current-password'
-                name='password'
-                className='block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg focus:border-blue-400 focus:ring-opacity-40 focus:outline-none focus:ring focus:ring-blue-300'
-                type='password'
-              />
-            </div>
-            <div className='mt-4'>
-            <div className='flex justify-between'>
-              <label
-                className='block mb-2 text-sm font-medium text-gray-600'
-                htmlFor='confirmPassword'
-              >
-                Confirm Password
-              </label>
-              </div>
-              <input
-                id='confirmPassword'
-                autoComplete='new-password'
-                name='confirmPassword'
-                className='block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg focus:border-blue-400 focus:ring-opacity-40 focus:outline-none focus:ring focus:ring-blue-300'
-                type='password'
-                required
-              />
-            </div>
-            <div className='mt-6'>
-              <button
-                type='submit'
-                className='w-full px-6 py-3 bg-red-700 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform rounded-lg hover:bg-red-800'
-              >
-                Sign Up
-              </button>
-            </div>
-          </form>
-          <div className='flex items-center justify-between mt-4'>
-            <span className='w-1/5 border-b border-red-500 md:w-1/4'></span>
-            <Link to='/login' className='text-xs text-gray-500 uppercase hover:underline'>
-              or sign in
-            </Link>
-            <span className='w-1/5 border-b border-red-500 md:w-1/4'></span>
+
+          <div className='mb-4'>
+            <label className='block mb-2'>Photo</label>
+            <input
+              name='photo'
+              type='file'
+              className='w-full p-2 border rounded'
+              required
+            />
           </div>
-        </div>
-        <div
-          className='hidden bg-cover bg-center lg:block lg:w-1/2'
-          style={{ backgroundImage: 'url(/bloodBridge.png)' }}
-        ></div>
+
+          <div className='mb-4'>
+            <label className='block mb-2'>Password</label>
+            <input
+              name='password'
+              type='password'
+              className='w-full p-2 border rounded'
+              required
+            />
+          </div>
+
+          <div className='mb-4'>
+            <label className='block mb-2'>Confirm Password</label>
+            <input
+              name='confirmPassword'
+              type='password'
+              className='w-full p-2 border rounded'
+              required
+            />
+          </div>
+
+          <button
+            type='submit'
+            className='w-full p-2 bg-red-600 text-white rounded hover:bg-red-700'
+          >
+            Sign Up
+          </button>
+        </form>
+
+        <p className='text-center mt-4'>
+          Already have an account?{' '}
+          <Link to='/login' className='text-red-600 hover:underline'>
+            Sign In
+          </Link>
+        </p>
       </div>
     </div>
   );

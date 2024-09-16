@@ -32,15 +32,7 @@ const Navbar = () => {
           <li className="hover:text-[#e93d41] lg:block hidden">
             <Link to='/add-friend'>Add Friend</Link>
           </li>
-          <li className='lg:block hidden '>
-            <Link to='/blog' className='justify-between hover:text-[#e93d41]'>
-              Blogs
-            </Link>
-          </li>
-          {user &&
-            <li className='lg:block hidden hover:text-[#e93d41] mr-16'>
-              <Link to='/funding'>Funding Links</Link>
-            </li>}
+         
 
 
           {!user && (
@@ -74,25 +66,13 @@ const Navbar = () => {
             >
               <li className='justify-between px-3 mt-1 mb-1'>{user.displayName}</li>
 
-              <li>
-                <Link to='/dashboard' className='justify-between text-black font-semibold text-sm hover:text-[#e93d41]'>
-                  Dashboard
-                </Link>
-              </li>
+          
 
 
               <li className="hover:text-[#e93d41] ">
                 <Link to='/add-friend'>Add Friend</Link>
               </li>
-              <li className=''>
-                <Link to='/blog' className='justify-between hover:text-[#e93d41]'>
-                  Blogs
-                </Link>
-              </li>
-              {user &&
-                <li className='hover:text-[#e93d41] mr-16'>
-                  <Link to='/funding'>Funding Links</Link>
-                </li>}
+            
 
 
 
